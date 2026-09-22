@@ -2,7 +2,6 @@ import Spinner from "./Spinner";
 
 export default function UserList() {
     return (
-        <>
             <div className="table-wrapper">
                 <table className="table">
                     <thead>
@@ -104,7 +103,5 @@ export default function UserList() {
                     </tbody>
                 </table>
             </div>
-            <button className="btn-add btn">Add new user</button>
-        </>
     );
 }
