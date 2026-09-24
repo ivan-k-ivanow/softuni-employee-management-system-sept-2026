@@ -1,6 +1,7 @@
 import './styles.css';
 import SaveUserModal from './components/SaveUserModal';
 import { useState, useEffect } from 'react';
+import { fetchUsers } from './api/usersApi';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -46,11 +47,20 @@ function App() {
 
             const updatedUsers = await fetchUsers();
             setUsers(updatedUsers);
-            
+
         } catch (error) {
             console.error('Error adding user:', error);
         } finally {
             setShowSaveUserModal(false);
+        }
+    };
+
+    const userUpdateHandler = async (updatedUser) => {
+        try {
+            const updatedUsers = await fetchUsers();
+            setUsers(updatedUsers);
+        } catch (error) {
+            console.error('Error updating user:', error);
         }
     };
 
@@ -61,7 +71,7 @@ function App() {
             <main className="main">
                 <section className="card users-container">
                     <UserSearch />
-                    <UserList users={users} />
+                    <UserList users={users} onUserUpdate={userUpdateHandler} />
 
                     <button className="btn-add btn" onClick={addUserClickHandler}>Add new user</button>
                     {showSaveUserModal && <SaveUserModal onClose={addUserCloseHandler} onSubmit={submitUserHandler} />}
@@ -74,14 +84,5 @@ function App() {
     )
 }
 
-async function fetchUsers() {
-    const response = await fetch(baseUrl, {
-        headers: {
-            'apikey': apiKey,
-        }
-    });
-    const data = await response.json();
-    return data;
-}
 
 export default App
