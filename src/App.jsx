@@ -8,14 +8,17 @@ import UserList from './components/UserList';
 import UserSearch from './components/UserSearch';
 import Pagination from './components/Pagination';
 
+const baseUrl = 'https://wvxsshmemqotouxkzhqe.supabase.co/rest/v1/users';
+const apiKey = 'sb_publishable_YakXuX-44-KSSK3jvxe02Q__s_3zhC1';
+
 function App() {
     const [users, setUsers] = useState([]);
     const [showSaveUserModal, setShowSaveUserModal] = useState(false);
 
     useEffect(() => {
-        fetch('https://wvxsshmemqotouxkzhqe.supabase.co/rest/v1/users', {
+        fetch(baseUrl, {
             headers: {
-                'apikey': 'sb_publishable_YakXuX-44-KSSK3jvxe02Q__s_3zhC1',
+                'apikey': apiKey,
             }
         })
             .then(res => res.json())
@@ -31,6 +34,20 @@ function App() {
         setShowSaveUserModal(false);
     }
 
+    const submitUserHandler = (user) => {
+        // Send user to Rest API
+        fetch(baseUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': apiKey,
+            },
+            body: JSON.stringify(user)
+        })
+            .then(() => console.log('User added successfully'))
+            .catch(error => console.error('Error adding user:', error))
+    }
+
     return (
         <>
             <Header />
@@ -41,7 +58,7 @@ function App() {
                     <UserList users={users} />
 
                     <button className="btn-add btn" onClick={addUserClickHandler}>Add new user</button>
-                    {showSaveUserModal && <SaveUserModal onClose={addUserCloseHandler} />}
+                    {showSaveUserModal && <SaveUserModal onClose={addUserCloseHandler} onSubmit={submitUserHandler} />}
                     <Pagination />
                 </section>
             </main>
