@@ -16,15 +16,13 @@ function App() {
     const [showSaveUserModal, setShowSaveUserModal] = useState(false);
 
     useEffect(() => {
-        fetch(baseUrl, {
-            headers: {
-                'apikey': apiKey,
-            }
-        })
-            .then(res => res.json())
+        // Fetch users from the API when the component mounts
+        fetchUsers()
             .then(data => setUsers(data))
             .catch(error => console.error('Error fetching users:', error));
     }, []);
+
+
 
     const addUserClickHandler = () => {
         setShowSaveUserModal(true);
@@ -34,20 +32,27 @@ function App() {
         setShowSaveUserModal(false);
     }
 
-    const submitUserHandler = (user) => {
+    const submitUserHandler = async (user) => {
         // Send user to Rest API
-        fetch(baseUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': apiKey,
-            },
-            body: JSON.stringify(user)
-        })
-            .then(() => console.log('User added successfully'))
-            .catch(error => console.error('Error adding user:', error))
-            .finally(() => setShowSaveUserModal(false));
-    }
+        try {
+            await fetch(baseUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': apiKey,
+                },
+                body: JSON.stringify(user)
+            });
+
+            const updatedUsers = await fetchUsers();
+            setUsers(updatedUsers);
+            
+        } catch (error) {
+            console.error('Error adding user:', error);
+        } finally {
+            setShowSaveUserModal(false);
+        }
+    };
 
     return (
         <>
@@ -67,6 +72,16 @@ function App() {
             <Footer />
         </>
     )
+}
+
+async function fetchUsers() {
+    const response = await fetch(baseUrl, {
+        headers: {
+            'apikey': apiKey,
+        }
+    });
+    const data = await response.json();
+    return data;
 }
 
 export default App
