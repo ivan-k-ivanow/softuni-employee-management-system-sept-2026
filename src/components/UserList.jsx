@@ -1,8 +1,10 @@
 import UserDetails from './UserDetails';
 import UserListItem from './UserListItem';
 import UserDeleteModal from './UserDeleteModal';
+import Spinner from './Spinner';
 import { useState } from 'react';
 import { fetchUsers } from '../api/usersApi.js';
+import SaveUserModal from './SaveUserModal.jsx';
 
 const baseUrl = 'https://wvxsshmemqotouxkzhqe.supabase.co/rest/v1/users';
 const apiKey = 'sb_publishable_YakXuX-44-KSSK3jvxe02Q__s_3zhC1';
@@ -14,6 +16,7 @@ export default function UserList({
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [showUserDetails, setShowUserDetails] = useState(false);
     const [showUserDelete, setShowUserDelete] = useState(false);
+    const [showUserEdit, setShowUserEdit] = useState(false);
 
     const showUserDetailsHandler = (userId) => {
         setSelectedUserId(userId);
@@ -25,11 +28,19 @@ export default function UserList({
         setShowUserDelete(true);
     };
 
+    const showUserEditHandler = (userId) => {
+        setSelectedUserId(userId);
+        setShowUserEdit(true);
+    };
+
+
     const hideModalHandler = () => {
+        setShowUserEdit(false);
         setShowUserDelete(false);
         setShowUserDetails(false);
         setSelectedUserId(null);
     };
+
 
     const deleteUserHandler = async () => {
         try {
@@ -107,11 +118,13 @@ export default function UserList({
                 </thead>
                 <tbody>
                     {/* <!-- Table row component --> */}
+                    {users.length === 0 && <Spinner />}
                     {users.map(user => (
                         <UserListItem
                             key={user.id}
                             onInfo={showUserDetailsHandler}
                             onDelete={showUserDeleteHandler}
+                            onEdit={showUserEditHandler}
                             {...user}
                         />
                     ))}
@@ -120,6 +133,7 @@ export default function UserList({
 
             {showUserDetails && <UserDetails userId={selectedUserId} onClose={hideModalHandler}/>}
             {showUserDelete && <UserDeleteModal onClose={hideModalHandler} onDelete={deleteUserHandler} />}
+            {showUserEdit && <SaveUserModal userId={selectedUserId} onClose={hideModalHandler} edit />}
         </div>
     );
 }
